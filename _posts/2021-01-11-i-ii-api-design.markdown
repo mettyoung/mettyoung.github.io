@@ -1,9 +1,8 @@
 ---
 layout: post
 title:  "API Design"
-date:   2020-10-12 00:00 +0800
+date:   2021-01-11 00:00 +0800
 categories: series I
-published: false
 ---
 ## Use Cases
 
