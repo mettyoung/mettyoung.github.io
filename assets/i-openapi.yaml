@@ -1,0 +1,302 @@
+openapi: 3.0.3
+
+info:
+  title: Expense Manager API
+  description: API designed for keeping expense records over time.
+  contact:
+    name: Emmett Young
+    url: https://mettyoung.com
+    email: mail@mettyoung.com
+  version: 1.0.0
+
+paths:
+  /expenses:
+    post:
+      tags:
+        - Expenses
+      summary: Log expense
+      description: Creates a new expense transaction.
+      operationId: logExpense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Expense'
+            example:
+              price: 1219.00
+              memo: "Apple iPhone 12 Mini 128GB"
+              date: "2021-01-01T19:00:00+08:00"
+      responses:
+        '201':
+          description: 
+            Returns expense ID of the newly created expense transaction.
+          content:
+            'application/hal+json':
+              schema:
+                type: object
+                properties:
+                  expenseId:
+                    type: integer
+                    format: int64
+                    description: "Expense ID"
+                  _links:
+                    $ref: '#/components/schemas/Links'
+              example: {
+                "expenseId": 1,
+                "_links": {
+                  "amendExpense": {
+                    "href": "/expenses/1"
+                  },
+                  "deleteExpense": {
+                    "href": "/expenses/1"
+                  }
+                }
+              }
+
+        '400':
+          description: Input model validation error
+          content:
+            'application/json':
+              schema:
+                description: TODO
+
+    get:
+      tags:
+        - Expenses
+      summary: Get all expenses
+      description: Get all expenses for a given a month in descending order.
+      operationId: getExpenses
+      parameters:
+      - name: month
+        in: query
+        required: true
+        description: Selected Month
+        schema:
+          type: number
+          format: int32
+          minimum: 1
+          maximum: 12
+        example: 1
+      - name: year
+        in: query
+        required: true
+        description: Selected Year
+        schema:
+          type: number
+          format: int32
+          minimum: 1970
+        example: 2021
+      responses:
+        '200':
+          description: An array of expense transactions.
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Expenses'
+        '400':
+          description: Input model validation error
+          content:
+            'application/json':
+              schema:
+                description: TODO
+
+  /expenses/report:
+    get:
+      tags:
+        - Expenses
+      summary: Get expense report 
+      description: Get expense report per month given a time duration in descending order.
+      operationId: getExpensesReport
+      parameters:
+      - name: from
+        in: query
+        required: true
+        description: | 
+          Beginning of the time frame in ISO-8601.\
+          Only Month and Year are significant.
+        schema:
+          type: string
+          format: date-time
+        example: '2020-12-01T00:00:00+08:00'
+      - name: to
+        in: query
+        required: true
+        description: | 
+          Inclusive end of the time frame in ISO-8601.\
+          Only Month and Year are significant.
+        schema:
+          type: string
+          format: date-time
+        example: '2020-01-01T00:00:00+08:00'
+      responses:
+        '200':
+          description: Returns the expense report.
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExpenseReport'
+                example: [
+                {
+                  "from": "2021-01-01T00:00:00+08:00",
+                  "to": "2021-01-31T23:59:59+08:00", 
+                  "totalExpenses": 3412.55,
+                },
+                {
+                  "from": "2020-12-01T00:00:00+08:00",
+                  "to": "2020-12-31T23:59:59+08:00", 
+                  "totalExpenses": 4123.20,
+                }
+              ]
+        '400':
+          description: Input model validation error
+          content:
+            'application/json':
+              schema:
+                description: TODO
+            
+
+  /expenses/{expenseId}:
+    parameters:
+    - name: expenseId
+      in: path
+      required: true
+      description: Selected expense
+      schema:
+        type: integer
+        format: int64
+      example: 1
+
+    put:
+      tags:
+        - Expenses
+      summary: Amend expense
+      description: Modify existing expense transaction.
+      operationId: amendExpense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Expense'
+            example:
+              price: 1219.99
+              memo: "Apple iPhone 12 Mini 128GB"
+              date: "2021-01-01T19:00:00+08:00"
+
+      responses:
+        '200':
+          description: Expense transaction is updated successfully.
+          content:
+            'application/hal+json':
+              schema:
+                type: object
+                properties:
+                  _links:
+                    $ref: '#/components/schemas/Links'
+              example: {
+                "_links": {
+                  "amendExpense": {
+                    "href": "/expenses/1"
+                  },
+                  "deleteExpense": {
+                    "href": "/expenses/1"
+                  }
+                }
+              }
+        '400':
+          description: Input model validation error
+          content:
+            'application/json':
+              schema:
+                description: TODO
+
+    delete:
+      tags:
+        - Expenses
+      summary: Delete expense
+      description: Delete existing expense transaction.
+      operationId: deleteExpense
+      responses:
+        '204':
+          description: Expense transaction is deleted successfully.
+      
+components:
+  schemas:
+    Expenses:
+      description: "An array of expense objects."
+      type: array
+      items:
+        $ref: '#/components/schemas/Expense'
+      example: [
+        {
+          "expenseId": 1,
+          "price": 30.99,
+          "memo": "Thermal Water Bottle",
+          "date": "2021-01-02T19:00:0008:00"
+        },
+        {
+          "expenseId": 2,
+          "price": 1219.99,
+          "memo": "Apple iPhone 12 Mini 128GB",
+          "date": "2021-01-01T19:00:00+08:00"
+        }
+      ]
+
+    Expense:
+      type: object
+      properties:
+        expenseId:
+          type: integer
+          format: int64
+          description: "Expense ID"
+          readOnly: true
+        price:
+          type: number
+          format: currency
+          description: "Price in currency format"
+          minimum: 0
+        memo:
+          type: string
+          description: "Description of the expenditure"
+          minLength: 1
+          maxLength: 255
+        date:
+          type: string
+          format: date-time
+          description: "Transaction date in ISO-8601 format"
+      required:
+      - price
+      - memo
+      - date
+
+    ExpenseReport:
+      type: object
+      readOnly: true
+      properties:
+        from:
+          type: string
+          format: date-time
+          description: "Beginning of the month in ISO-8601"
+        to:
+          type: string
+          format: date-time
+          description: "End of the month in ISO-8601"
+        totalExpenses:
+          type: number
+          format: currency
+          description: "Total expenses in currency format"
+
+    Links:
+      type: object
+      readOnly: true
+      description: Possible actions
+      additionalProperties: 
+        type: object
+        description: The relationship between the invoking and next action 
+        additionalProperties: 
+          type: string
+          format: url
+          description: URL of the API endpoint

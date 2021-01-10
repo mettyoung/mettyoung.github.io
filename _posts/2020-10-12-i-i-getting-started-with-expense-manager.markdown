@@ -20,16 +20,17 @@ We will build a minimum viable product that provides enough value for users to u
 
 ### User Stories
 - User can record an expense transaction given price, memo and date.
-- User can amend an expense transaction given any or all of the fields.
+- User can amend an expense transaction given price, memo and date.
 - User can delete an expense transaction.
 - User can view all of the expenses recorded.
-- User can see the statistical report that contains the total expenses per month.
+- User can view the expense report containing total expenses per month.
 
 ### Limitations
 - Only cash outflow is recorded. There is no cash inflow.
 - There will be no categories for all of the expenses.
 - No wallet balance.
 - No currency used.
+- Multi-tenancy not supported.
 
 ## Technical Specifications
 We are going to build a REST API which is usually paired with client-side rendering Web UI. Another alternative is using server-side rendering Web UI which is usually paired with MVC web application. My reason for choosing REST API with client-side Web UI is simple: **With client-side rendering, the user interface is more fluid than server-side rendering. Of course, this comes with a price of more complexity but I think it is worth it!**
