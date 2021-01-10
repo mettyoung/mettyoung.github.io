@@ -39,27 +39,3 @@ We are going to build a REST API which is usually paired with client-side render
 All right! The features aren't much but I think this is enough to provide users some prototype to gauge their interest for the product. Through the specifications listed above, the user will be able to log all of his expenses to the Web UI which can be accessed through different devices. Since the records will be persisted to a database, data sync will automatically happen between devices. The user will also be able to see his total expenses per month to gauge if he's overspending. 
 
 Let us now proceed with API design!
-
-
-
-
-
-
-
-{% comment %}
-Jekyll also offers powerful support for code snippets:
-
-{% highlight ruby %}
-def print_hi(name)
-  puts "Hi, #{name}"
-end
-print_hi('Tom')
-#=> prints 'Hi, Tom' to STDOUT.
-{% endhighlight %}
-
-Check out the [Jekyll docs][jekyll-docs] for more info on how to get the most out of Jekyll. File all bugs/feature requests at [Jekyll’s GitHub repo][jekyll-gh]. If you have questions, you can ask them on [Jekyll Talk][jekyll-talk].
-
-[jekyll-docs]: https://jekyllrb.com/docs/home
-[jekyll-gh]:   https://github.com/jekyll/jekyll
-[jekyll-talk]: https://talk.jekyllrb.com/
-{% endcomment %}

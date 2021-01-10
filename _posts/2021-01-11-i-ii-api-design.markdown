@@ -27,17 +27,15 @@ There are two guidelines that I wish to use in my API design.
 
 **In my case, I'm going to use REST Level 3.**
 
-**Secondly, I wish to sit down and design how our API will look like first.** *This is my preferred way of doing things.* Based on my experience, it is helpful to design first because it pushes us to consider things we might miss if we immediately jumping to coding. For designing APIs, I think it will be beneficial if we conform to some standardized way of writing API specification. 
+**Secondly, I wish to sit down and design how our API will look like first.** *This is my preferred way of doing things.* Based on my experience, it is helpful to design first because it pushes us to consider things we might miss if we immediately jump to coding. For designing APIs, I think it will be beneficial if we conform to some standardized way of writing API specification. 
 
-In our case, **I will be using [OpenAPI specification](https://swagger.io/specification/)**. OpenAPI specification can work with [Swagger UI](https://swagger.io/tools/swagger-ui/) or [Redoc](ttps://redoc.ly) to generate a Web UI to visualized the API specification better. 
+In our case, **I will be using [OpenAPI specification](https://swagger.io/specification/)**. OpenAPI specification can work with [Swagger UI](https://swagger.io/tools/swagger-ui/) or [Redoc](https://redoc.ly) to generate a Web UI to visualized the API specification better. 
 
 *An added benefit of OpenAPI specification is the amount of [tooling](https://openapi.tools) provided by the developer community. Please make sure to check them out!*
 
 ## Epilogue
 
-We can now finally design our API for our expense manager application!
-
-Please click [here](/static/i-openapi.html) to view the beautiful API documentation.
+Finally, please click [here](/static/i-openapi.html) to view the beautiful API documentation for our expense manager application!
 
 Now that we've finished the API design, let's proceed with system design.
 
