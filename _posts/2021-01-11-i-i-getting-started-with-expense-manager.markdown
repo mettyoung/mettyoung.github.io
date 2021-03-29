@@ -3,6 +3,7 @@ layout: post
 title:  "Getting Started with Expense Manager"
 date:   2021-01-11 00:00 +0800
 categories: series I
+published: false
 ---
 This is my first blog post and I thought of writing a series that will walk us through how to build a full-blown web application that can be deployed to the cloud.
 
