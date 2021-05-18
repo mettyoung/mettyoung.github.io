@@ -50,7 +50,7 @@ Basically, it is a model breaking down the principal elements of a REST API. Her
 
 ## Epilogue
 
-Since the main focus of this blog post is the OpenAPI specification, I will take the privilege of skipping the explanation on designing API endpoints and just present you the [API documentation](/static/i-openapi.html) for our expense manager application! 
+Since the main focus of this blog post is the OpenAPI specification, I will take the privilege of skipping the explanation on designing API endpoints and just present you the [API documentation](/assets/i-openapi.html) for our expense manager application! 
 
 Please feel free to browse it. I hope this short blog post help you in some way! 
 
