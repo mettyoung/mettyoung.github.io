@@ -4,3 +4,74 @@
         text-align: center;
     }
 }
+
+.nav-menu {
+    margin-top: 0 !important;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    text-align: center !important;
+    float: none !important;
+    line-height: 27px;
+}
+
+.footer-link-container{
+    margin: 0 auto;
+    max-width: 740px;
+    padding: 10px 0;
+    width: 100%;
+  
+    .nav-menu {
+      font-size: clamp(0.8rem, 1.5vw, 1rem);
+    }
+  }
+  
+  .footer-link-outer {
+    background: #eee;
+    height: 64px;
+  
+    nav {
+      a {
+        font-weight: bold;
+        font-size: clamp(0.8rem, 1.5vw, 1rem);
+        color: #5f40f6;
+  
+        @include mobile {
+          margin: 0 10px;
+          color: #333;
+        }
+      }
+    }
+  }
+  
+  .projects-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(48%, 1fr));
+    gap: 1em;
+  
+    .project-box {
+      padding: 15px;
+      box-shadow: rgba(36,37,38,0.21) 2px 1px 7px 0px;
+      border-radius: 10px;
+    
+      h2 {
+        text-align: left;
+        font-size: 25px;
+        margin: 0;
+      }
+    
+      p {
+        margin: 0;
+      }
+    
+      blockquote {
+        p {
+          margin: 0 0 5px 0;
+        }
+      }
+    
+      img {
+        border-radius: 10px;
+      }
+    }
+  }
+  
