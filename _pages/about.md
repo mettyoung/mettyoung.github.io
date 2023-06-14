@@ -4,6 +4,8 @@ title: About
 permalink: /about/
 ---
 
-I'm Emmett Young, born and raised in the Republic of Philippines. I'm a Chinese descandant where my ancestors originated from Xiamen, China. I graduated with a bachelor's degree in Computer Engineer in the top 3 universities - De La Salle University, Manila. After working 3 years as a full-stack engineer in the Philippines, I continued my software engineering career in Singapore where I eventually became a Permanent Resident.
+My name is Emmett Young, and I was born and raised in the Republic of the Philippines. I am of Chinese descent, and my ancestors are from Xiamen, China. I hold a bachelor's degree in Computer Engineering from one of the top three universities in the Philippines, De La Salle University, Manila.
 
-If you want to know more about my experience and skill set, you can check my [CV](https://github.com/mettyoung/my-resume/blob/master/dist/Young_CV.pdf), my [projects](/projects) and even my [undergraduate thesis](https://github.com/mettyoung/visual-simultaneous-localization-and-mapping-co-operating-UAVs).
+After graduating, I worked as a full-stack engineer in the Philippines for three years. During that time, I gained valuable experience and skills that have helped me throughout my career. I then moved to Singapore to continue my software engineering career and eventually became a Permanent Resident.
+
+If you would like to learn more about my experience and skill set, please refer to my [CV](https://github.com/mettyoung/my-resume/blob/master/dist/Young_CV.pdf), [projects](/projects), and [undergraduate thesis](https://github.com/mettyoung/visual-simultaneous-localization-and-mapping-co-operating-UAVs). Thank you for taking the time to learn more about me.
