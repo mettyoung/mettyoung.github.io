@@ -1,12 +1,6 @@
 ---
 layout: default
 ---
-{% capture current_year %}{{ site.time | date: "%Y" }}{% endcapture %}
-
-{% macro year() %}
-  {{ current_year }}
-{% endmacro %}
-
 <div class="posts">
   {% for post in paginator.posts %}
     <article class="post">
