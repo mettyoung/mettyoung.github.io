@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Design Cheat Sheet – Capacity, Paths & Latency</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --green: #4ade80;
+      --yellow: #facc15;
+      --red: #f87171;
+      --purple: #c084fc;
+      --orange: #fb923c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 40px 20px;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 32px;
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 28px;
+      overflow-x: auto;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      margin: 20px 0 12px;
+      color: var(--accent);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      padding: 11px 13px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: #0f172a;
+      color: var(--accent);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .tag-ok { background: rgba(74, 222, 128, 0.15); color: var(--green); }
+    .tag-warn { background: rgba(250, 204, 21, 0.15); color: var(--yellow); }
+    .tag-prefer { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
+
+    .short-version {
+      background: #0f172a;
+      border-left: 4px solid var(--accent);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.88rem;
+      white-space: pre-wrap;
+      color: #cbd5e1;
+    }
+
+    .note {
+      margin-top: 8px;
+      padding: 14px 16px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 8px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .note strong {
+      color: var(--accent);
+    }
+
+    /* Flow Diagram Styles */
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0 8px;
+      padding: 18px 14px;
+      background: #0f172a;
+      border-radius: 10px;
+      overflow-x: auto;
+    }
+
+    .box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      white-space: nowrap;
+      border: 1.5px solid transparent;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* --- Shapes --- */
+    .shape-round {
+      border-radius: 10px;
+    }
+    .shape-pill {
+      border-radius: 999px;
+      padding: 8px 16px;
+    }
+    .shape-diamond {
+      border-radius: 4px;
+      transform: rotate(45deg);
+      width: 52px;
+      height: 52px;
+      padding: 0;
+    }
+    .shape-diamond span {
+      transform: rotate(-45deg);
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .shape-cylinder {
+      border-radius: 50px / 14px;
+      padding: 10px 14px;
+    }
+    .shape-skew {
+      border-radius: 6px;
+      transform: skewX(-12deg);
+    }
+    .shape-skew span {
+      transform: skewX(12deg);
+      display: inline-block;
+    }
+    .shape-rect {
+      border-radius: 6px;
+    }
+
+    /* --- Colors --- */
+    .box-client   { background: rgba(56, 189, 248, 0.18); color: var(--accent); border-color: rgba(56, 189, 248, 0.4); }
+    .box-cdn      { background: rgba(74, 222, 128, 0.15); color: var(--green); border-color: rgba(74, 222, 128, 0.4); }
+    .box-lb       { background: rgba(251, 146, 60, 0.18); color: var(--orange); border-color: rgba(251, 146, 60, 0.45); }
+    .box-gw       { background: rgba(192, 132, 252, 0.15); color: var(--purple); border-color: rgba(192, 132, 252, 0.4); }
+    .box-app      { background: rgba(250, 204, 21, 0.14); color: var(--yellow); border-color: rgba(250, 204, 21, 0.4); }
+    .box-redis    { background: rgba(248, 113, 113, 0.14); color: var(--red); border-color: rgba(248, 113, 113, 0.4); }
+    .box-db       { background: rgba(56, 189, 248, 0.14); color: #7dd3fc; border-color: rgba(56, 189, 248, 0.35); }
+    .box-kafka    { background: rgba(74, 222, 128, 0.14); color: #86efac; border-color: rgba(74, 222, 128, 0.35); }
+    .box-ws       { background: rgba(192, 132, 252, 0.16); color: #d8b4fe; border-color: rgba(192, 132, 252, 0.4); }
+    .box-s3       { background: rgba(251, 146, 60, 0.14); color: #fdba74; border-color: rgba(251, 146, 60, 0.35); }
+    .box-worker   { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border-color: rgba(148, 163, 184, 0.35); }
+
+    /* --- Stacked instances --- */
+    .stack {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 4px;
+    }
+    .stack .box {
+      position: relative;
+    }
+    .stack .layer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 100%;
+      border: 1.5px solid;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+    .stack .layer-1 {
+      top: -5px;
+      left: 3px;
+      right: -3px;
+      opacity: 0.45;
+      z-index: 0;
+    }
+    .stack .layer-2 {
+      top: -10px;
+      left: 6px;
+      right: -6px;
+      opacity: 0.25;
+      z-index: -1;
+    }
+    /* Match layer border colors to parent */
+    .stack-app .layer { border-color: rgba(250, 204, 21, 0.35); border-radius: 6px; background: rgba(250, 204, 21, 0.06); }
+    .stack-db .layer { border-color: rgba(56, 189, 248, 0.3); border-radius: 50px / 14px; background: rgba(56, 189, 248, 0.05); }
+    .stack-redis .layer { border-color: rgba(248, 113, 113, 0.3); border-radius: 50px / 14px; background: rgba(248, 113, 113, 0.05); }
+    .stack-worker .layer { border-color: rgba(148, 163, 184, 0.3); border-radius: 6px; background: rgba(148, 163, 184, 0.05); }
+    .stack-kafka .layer { border-color: rgba(74, 222, 128, 0.3); border-radius: 6px; background: rgba(74, 222, 128, 0.05); }
+
+    .arrow {
+      color: var(--muted);
+      font-size: 1.15rem;
+      flex-shrink: 0;
+      font-weight: 300;
+    }
+
+
+    /* Vertical fork layout */
+    .fork {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-left: 2px;
+      padding-left: 10px;
+      border-left: 2px solid var(--border);
+    }
+    .fork-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .fork-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      min-width: 52px;
+      text-align: right;
+    }
+
+    .path-label {
+      font-size: 0.9rem;
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .latency-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .latency-card {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .latency-card .title {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .latency-card .value {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .latency-card .sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>System Design Cheat Sheet</h1>
+  <p class="subtitle">Capacity limits, request paths & latency budgets for interviews</p>
+
+  <!-- ===================== CAPACITY ===================== -->
+  <div class="card">
+    <h2>1. SQL → NoSQL Decision Table (by QPS)</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>QPS Limit</th>
+          <th>Approach / Recommendation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Write</strong></td>
+          <td>~10k QPS (conservative)</td>
+          <td><span class="tag tag-ok">Single primary</span> — Acceptable</td>
+        </tr>
+        <tr>
+          <td><strong>Write</strong></td>
+          <td>&gt; 10–20k QPS</td>
+          <td><span class="tag tag-prefer">Prefer NoSQL</span> — KV &gt; Wide Column &gt; Document<br><small style="color:var(--muted)">sharding SQL is complex</small></td>
+        </tr>
+        <tr>
+          <td><strong>Read</strong></td>
+          <td>~100k QPS</td>
+          <td><span class="tag tag-ok">3–5 read replicas</span> — Acceptable</td>
+        </tr>
+        <tr>
+          <td><strong>Read</strong></td>
+          <td>&gt; 1M QPS</td>
+          <td><span class="tag tag-warn">15–20+ replicas</span> → Expensive<br>
+              Prefer NoSQL — <strong>KV &gt; Wide Column &gt; Document</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===================== TAIL LATENCY ===================== -->
+  <div class="card">
+    <h2>2. Database Throughput & Latency Map</h2>
+
+    <h3>Throughput Ranking (Highest → Lowest)</h3>
+    <div class="flow">
+      <span class="box box-redis">KV (In-memory)<br><small>Redis · ~100k+</small></span>
+      <span class="arrow">→</span>
+      <span class="box box-kafka">Wide Column<br><small>Cassandra · 20–50k+</small></span>
+      <span class="arrow">→</span>
+      <span class="box box-app">Document<br><small>MongoDB · 10–20k</small></span>
+      <span class="arrow">→</span>
+      <span class="box box-ws">Graph<br><small>Neo4j · 5–10k</small></span>
+    </div>
+
+    <table style="margin-top:20px">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Examples</th>
+          <th>QPS Limit (single node)</th>
+          <th>Write p99</th>
+          <th>Read p99</th>
+          <th>When to use</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>KV (In-memory)</strong></td>
+          <td>Redis, Memcached, Dragonfly</td>
+          <td>~100k ops/s<br>(up to 500k–1M+)</td>
+          <td><strong>&lt; 1–5 ms</strong></td>
+          <td><strong>&lt; 1–5 ms</strong></td>
+          <td>Lowest latency, caching, sessions</td>
+        </tr>
+        <tr>
+          <td><strong>Wide Column</strong></td>
+          <td>Cassandra, DynamoDB, Scylla</td>
+          <td>20k–50k+ ops/s</td>
+          <td>5–15 ms</td>
+          <td>5–20 ms</td>
+          <td>High write throughput, scalable</td>
+        </tr>
+        <tr>
+          <td><strong>Document</strong></td>
+          <td>MongoDB, Couchbase, Firestore</td>
+          <td>10k–20k ops/s</td>
+          <td>10–30 ms</td>
+          <td>5–20 ms</td>
+          <td>Flexible schema</td>
+        </tr>
+        <tr>
+          <td><strong>Graph</strong></td>
+          <td>Neo4j, Amazon Neptune</td>
+          <td>5k–10k traversals/s</td>
+          <td>10–30+ ms</td>
+          <td>10–30+ ms</td>
+          <td>Relationship-heavy queries</td>
+        </tr>
+        <tr style="border-top: 2px solid var(--border);">
+          <td colspan="6" style="padding: 8px 13px; color: var(--muted); font-size: 0.8rem; background: #0f172a;">
+            — SQL —
+          </td>
+        </tr>
+        <tr>
+          <td><strong>SQL</strong></td>
+          <td>MySQL, PostgreSQL</td>
+          <td>Write ~10k<br>Read ~100k (w/ replicas)</td>
+          <td>10–30 ms</td>
+          <td>5–20 ms</td>
+          <td>Default choice</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>If you need p99 &lt; 2 ms</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Requirement</th>
+          <th>Recommended Solution</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>p99 &lt; 2 ms</strong></td>
+          <td><strong>In-memory KV</strong> (Redis family)</td>
+          <td>Most reliable option</td>
+        </tr>
+        <tr>
+          <td>Still need durability</td>
+          <td>Redis + async persist / primary DB</td>
+          <td>Keep Redis on the fast path</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note" style="margin-top:16px">
+      <strong>Rule of thumb:</strong> Need consistent p99 &lt; 2–5 ms? → Use in-memory KV (Redis).<br>
+      Disk-based databases (SQL or most NoSQL) rarely deliver consistent sub-2ms tail latency under real load.
+    </div>
+  </div>
+
+  <!-- ===================== REQUEST PATHS ===================== -->
+  <div class="card">
+    <h2>3. System Design Patterns</h2>
+    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:16px;">
+      Diagrams use vertical forks where the path branches. Stacked boxes = multiple instances.<br>
+      <span style="font-size:0.8rem;">QPS &amp; latency are interview ballparks (order of magnitude).</span>
+    </p>
+
+    <!-- 1. Read-Heavy -->
+    <p class="path-label">1. Read-Heavy + Cache</p>
+    <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">Bitly · Yelp · LeetCode · Distributed Cache · Rate Limiter</p>
+    <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
+      Read: 100k–1M+ QPS · Write: 1k–10k QPS · p99: &lt; 20–50 ms (Redis hit)
+    </p>
+    <div class="flow">
+      <span class="box box-client shape-round">Client</span>
+      <span class="arrow">→</span>
+      <span class="box box-cdn shape-pill">CDN</span>
+      <span class="arrow">→</span>
+      <span class="box box-lb shape-diamond"><span>LB</span></span>
+      <span class="arrow">→</span>
+      <span class="box box-gw shape-round">API GW</span>
+      <span class="arrow">→</span>
+      <span class="stack stack-app">
+        <span class="box box-app shape-rect">App</span>
+        <span class="layer layer-1"></span>
+        <span class="layer layer-2"></span>
+      </span>
+      <span class="arrow">→</span>
+      <div class="fork">
+        <div class="fork-row">
+          <span class="fork-label">hit</span>
+          <span class="box box-redis shape-cylinder">Redis</span>
+        </div>
+        <div class="fork-row">
+          <span class="fork-label">miss</span>
+          <span class="stack stack-db">
+            <span class="box box-db shape-cylinder">DB Replica</span>
+            <span class="layer layer-1"></span>
+            <span class="layer layer-2"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Fan-out -->
+    <p class="path-label" style="margin-top:22px">2. Fan-out on Write</p>
+    <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">FB News Feed · Instagram · Notification System · FB Live Comments · News Aggregator</p>
+    <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
+      Read: 50k–500k QPS · Write: 5k–50k QPS · p99: 50–150 ms (write) / &lt; 50 ms (read from cache)
+    </p>
+    <div class="flow">
+      <span class="box box-client shape-round">Client</span>
+      <span class="arrow">→</span>
+      <span class="box box-lb shape-diamond"><span>LB</span></span>
+      <span class="arrow">→</span>
+      <span class="box box-gw shape-round">API GW</span>
+      <span class="arrow">→</span>
+      <span class="stack stack-app">
+        <span class="box box-app shape-rect">App</span>
+        <span class="layer layer-1"></span>
+        <span class="layer layer-2"></span>
+      </span>
+      <span class="arrow">→</span>
+      <div class="fork">
+        <div class="fork-row">
+          <span class="fork-label">write</span>
+          <span class="box box-db shape-cylinder">DB</span>
+        </div>
+        <div class="fork-row">
+          <span class="fork-label">fan-out</span>
+          <span class="stack stack-kafka">
+            <span class="box box-kafka shape-skew"><span>Kafka</span></span>
+            <span class="layer layer-1"></span>
+          </span>
+          <span class="arrow">→</span>
+          <span class="stack stack-worker">
+            <span class="box box-worker shape-rect">Workers</span>
+            <span class="layer layer-1"></span>
+            <span class="layer layer-2"></span>
+          </span>
+          <span class="arrow">→</span>
+          <span class="box box-redis shape-cylinder">Timeline Caches</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Real-time -->
+    <p class="path-label" style="margin-top:22px">3. Real-time (WS / Pub-Sub)</p>
+    <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">WhatsApp · Google Docs · Online Chess · Tinder · Uber · ChatGPT · FB Live Comments</p>
+    <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
+      Read/Push: 10k–100k msg/s · Write: 10k–100k msg/s · p99: &lt; 50–100 ms (push)
+    </p>
+    <div class="flow">
+      <span class="box box-client shape-round">Client</span>
+      <span class="arrow">↔</span>
+      <span class="box box-cdn shape-pill">CDN</span>
+      <span class="arrow">→</span>
+      <span class="box box-lb shape-diamond"><span>LB</span></span>
+      <span class="arrow">→</span>
+      <span class="box box-gw shape-round">API GW</span>
+      <span class="arrow">→</span>
+      <span class="stack stack-app">
+        <span class="box box-ws shape-rect">WS / SSE</span>
+        <span class="layer layer-1"></span>
+        <span class="layer layer-2"></span>
+      </span>
+      <span class="arrow">→</span>
+      <div class="fork">
+        <div class="fork-row">
+          <span class="fork-label">live</span>
+          <span class="box box-redis shape-cylinder">Redis Pub/Sub</span>
+        </div>
+        <div class="fork-row">
+          <span class="fork-label">persist</span>
+          <span class="box box-kafka shape-skew"><span>Kafka</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Media -->
+    <p class="path-label" style="margin-top:22px">4. Media + Async Processing</p>
+    <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">Dropbox · YouTube · Instagram · Strava</p>
+    <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
+      Upload: 1k–20k QPS · Read (CDN): 100k–1M+ · p99: upload &lt; 200–500 ms · processing async
+    </p>
+    <div class="flow">
+      <span class="box box-client shape-round">Client</span>
+      <span class="arrow">→</span>
+      <span class="box box-cdn shape-pill">CDN</span>
+      <span class="arrow">→</span>
+      <span class="box box-lb shape-diamond"><span>LB</span></span>
+      <span class="arrow">→</span>
+      <span class="box box-gw shape-round">API GW</span>
+      <span class="arrow">→</span>
+      <span class="stack stack-app">
+        <span class="box box-app shape-rect">App</span>
+        <span class="layer layer-1"></span>
+      </span>
+      <span class="arrow">→</span>
+      <div class="fork">
+        <div class="fork-row">
+          <span class="fork-label">store</span>
+          <span class="box box-s3 shape-cylinder">S3</span>
+        </div>
+        <div class="fork-row">
+          <span class="fork-label">process</span>
+          <span class="box box-kafka shape-skew"><span>Kafka</span></span>
+          <span class="arrow">→</span>
+          <span class="stack stack-worker">
+            <span class="box box-worker shape-rect">Media Workers</span>
+            <span class="layer layer-1"></span>
+            <span class="layer layer-2"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Event Aggregation -->
+    <p class="path-label" style="margin-top:22px">5. Event / Write Aggregation</p>
+    <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">Ad Click Aggregator · Metrics Monitoring · Price Tracking · Web Crawler · Job Scheduler</p>
+    <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
+      Write/Ingest: 50k–1M+ events/s · Read: 1k–20k QPS · p99: ingest &lt; 50–100 ms · query varies
+    </p>
+    <div class="flow">
+      <span class="box box-client shape-round">Client</span>
+      <span class="arrow">→</span>
+      <span class="box box-cdn shape-pill">CDN</span>
+      <span class="arrow">→</span>
+      <span class="box box-lb shape-diamond"><span>LB</span></span>
+      <span class="arrow">→</span>
+      <span class="box box-gw shape-round">API GW</span>
+      <span class="arrow">→</span>
+      <span class="stack stack-app">
+        <span class="box box-app shape-rect">App</span>
+        <span class="layer layer-1"></span>
+      </span>
+      <span class="arrow">→</span>
+      <div class="fork">
+        <div class="fork-row">
+          <span class="fork-label">write</span>
+          <span class="box box-db shape-cylinder">DB</span>
+        </div>
+        <div class="fork-row">
+          <span class="fork-label">async</span>
+          <span class="stack stack-kafka">
+            <span class="box box-kafka shape-skew"><span>Kafka</span></span>
+            <span class="layer layer-1"></span>
+          </span>
+          <span class="arrow">→</span>
+          <span class="stack stack-worker">
+            <span class="box box-worker shape-rect">Aggregators</span>
+            <span class="layer layer-1"></span>
+            <span class="layer layer-2"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Search -->
+    <p class="path-label" style="margin-top:22px">6. Search-Heavy</p>
+    <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">FB Post Search · Yelp · News Aggregator · YouTube Top K</p>
+    <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
+      Read/Search: 10k–100k QPS · Write/Index: 1k–20k QPS · p99: search 50–200 ms
+    </p>
+    <div class="flow">
+      <span class="box box-client shape-round">Client</span>
+      <span class="arrow">→</span>
+      <span class="box box-cdn shape-pill">CDN</span>
+      <span class="arrow">→</span>
+      <span class="box box-lb shape-diamond"><span>LB</span></span>
+      <span class="arrow">→</span>
+      <span class="box box-gw shape-round">API GW</span>
+      <span class="arrow">→</span>
+      <span class="stack stack-app">
+        <span class="box box-app shape-rect">App</span>
+        <span class="layer layer-1"></span>
+      </span>
+      <span class="arrow">→</span>
+      <div class="fork">
+        <div class="fork-row">
+          <span class="fork-label">read</span>
+          <span class="stack stack-app">
+            <span class="box box-ws shape-rect">Elasticsearch</span>
+            <span class="layer layer-1"></span>
+            <span class="layer layer-2"></span>
+          </span>
+        </div>
+        <div class="fork-row">
+          <span class="fork-label">index</span>
+          <span class="box box-db shape-cylinder">DB</span>
+          <span class="arrow">→</span>
+          <span class="box box-kafka shape-skew"><span>CDC</span></span>
+          <span class="arrow">→</span>
+          <span class="box box-ws shape-rect">ES</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Contention -->
+    <p class="path-label" style="margin-top:22px">7. Contention / Consistency</p>
+    <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">Ticketmaster · Online Auction · Payment System · Robinhood · Local Delivery</p>
+    <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
+      Write: 1k–20k QPS (limited by locks) · Read: 10k–100k QPS · p99: 50–200 ms (hot rows higher)
+    </p>
+    <div class="flow">
+      <span class="box box-client shape-round">Client</span>
+      <span class="arrow">→</span>
+      <span class="box box-lb shape-diamond"><span>LB</span></span>
+      <span class="arrow">→</span>
+      <span class="box box-gw shape-round">API GW</span>
+      <span class="arrow">→</span>
+      <span class="stack stack-app">
+        <span class="box box-app shape-rect">App</span>
+        <span class="layer layer-1"></span>
+      </span>
+      <span class="arrow">→</span>
+      <div class="fork">
+        <div class="fork-row">
+          <span class="fork-label">sync</span>
+          <span class="box box-db shape-cylinder">DB + Lock / Queue</span>
+        </div>
+        <div class="fork-row">
+          <span class="fork-label">async</span>
+          <span class="box box-kafka shape-skew"><span>Kafka</span></span>
+          <span class="arrow">→</span>
+          <span class="box box-worker shape-rect">Notify / Analytics</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Geospatial -->
+    <p class="path-label" style="margin-top:22px">8. Geospatial / Matching</p>
+    <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">Uber · Tinder · Local Delivery · Strava</p>
+    <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
+      Location write: 10k–100k QPS · Match/read: 10k–50k QPS · p99: 50–150 ms
+    </p>
+    <div class="flow">
+      <span class="box box-client shape-round">Client</span>
+      <span class="arrow">→</span>
+      <span class="box box-lb shape-diamond"><span>LB</span></span>
+      <span class="arrow">→</span>
+      <span class="box box-gw shape-round">API GW</span>
+      <span class="arrow">→</span>
+      <span class="stack stack-app">
+        <span class="box box-app shape-rect">App</span>
+        <span class="layer layer-1"></span>
+        <span class="layer layer-2"></span>
+      </span>
+      <span class="arrow">→</span>
+      <span class="box box-redis shape-cylinder">Geo Index</span>
+      <span class="arrow">→</span>
+      <span class="box box-kafka shape-skew"><span>Matching</span></span>
+    </div>
+
+    <div class="note" style="margin-top:20px">
+      <strong>Fork layout:</strong> vertical branch after the split point (hit/miss, write/fan-out, live/persist, etc.)<br>
+      Stacked boxes = multiple instances · ◆ = LB · Cylinder = Cache/DB/S3 · Skew = Queue<br>
+      QPS/latency numbers are rough interview ballparks, not production guarantees.
+    </div>
+  </div>
+
+
+</body>
+</html>
