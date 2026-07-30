@@ -49,9 +49,12 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
     min-width: 0;
   }
 
-  @media (max-width: 900px) {
+  @media screen and (max-width: 640px) {
     .cheatsheet .cards-grid {
-      grid-template-columns: 1fr;
+      display: block;
+    }
+    .cheatsheet .col-left {
+      display: block;
     }
   }
 
