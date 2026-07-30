@@ -8,16 +8,16 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
 <div class="cheatsheet">
 <style>
   .cheatsheet {
-    --card: #1e293b;
-    --border: #334155;
-    --text: #e2e8f0;
-    --muted: #94a3b8;
-    --accent: #38bdf8;
-    --green: #4ade80;
-    --yellow: #facc15;
-    --red: #f87171;
-    --purple: #c084fc;
-    --orange: #fb923c;
+    --card: #f8f8f8;
+    --border: #e2e2e2;
+    --text: #333;
+    --muted: #666;
+    --accent: #0369a1;
+    --green: #15803d;
+    --yellow: #a16207;
+    --red: #b91c1c;
+    --purple: #7e22ce;
+    --orange: #c2410c;
 
     font-family: -system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: #404040;
@@ -38,10 +38,11 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
     background: var(--card);
     color: var(--text);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 10px;
     padding: 24px;
     margin-bottom: 28px;
     overflow-x: auto;
+    box-shadow: rgba(36, 37, 38, 0.12) 2px 1px 7px 0px;
   }
 
   .cheatsheet h2 {
@@ -69,7 +70,7 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
   }
 
   .cheatsheet th {
-    background: #0f172a;
+    background: #eef1f5;
     color: var(--accent);
     font-weight: 600;
     white-space: nowrap;
@@ -87,26 +88,26 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
     font-weight: 500;
   }
 
-  .cheatsheet .tag-ok { background: rgba(74, 222, 128, 0.15); color: var(--green); }
-  .cheatsheet .tag-warn { background: rgba(250, 204, 21, 0.15); color: var(--yellow); }
-  .cheatsheet .tag-prefer { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
+  .cheatsheet .tag-ok { background: rgba(21, 128, 61, 0.12); color: var(--green); }
+  .cheatsheet .tag-warn { background: rgba(161, 98, 7, 0.12); color: var(--yellow); }
+  .cheatsheet .tag-prefer { background: rgba(3, 105, 161, 0.12); color: var(--accent); }
 
   .cheatsheet .short-version {
-    background: #0f172a;
+    background: #eef1f5;
     border-left: 4px solid var(--accent);
     padding: 16px 20px;
     border-radius: 0 8px 8px 0;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.88rem;
     white-space: pre-wrap;
-    color: #cbd5e1;
+    color: #333;
   }
 
   .cheatsheet .note {
     margin-top: 8px;
     padding: 14px 16px;
-    background: rgba(56, 189, 248, 0.08);
-    border: 1px solid rgba(56, 189, 248, 0.2);
+    background: rgba(3, 105, 161, 0.06);
+    border: 1px solid rgba(3, 105, 161, 0.2);
     border-radius: 8px;
     font-size: 0.88rem;
     color: var(--muted);
@@ -124,7 +125,7 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
     gap: 10px;
     margin: 12px 0 8px;
     padding: 18px 14px;
-    background: #0f172a;
+    background: #eef1f5;
     border-radius: 10px;
     overflow-x: auto;
   }
@@ -179,17 +180,17 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
   }
 
   /* --- Colors --- */
-  .cheatsheet .box-client   { background: rgba(56, 189, 248, 0.18); color: var(--accent); border-color: rgba(56, 189, 248, 0.4); }
-  .cheatsheet .box-cdn      { background: rgba(74, 222, 128, 0.15); color: var(--green); border-color: rgba(74, 222, 128, 0.4); }
-  .cheatsheet .box-lb       { background: rgba(251, 146, 60, 0.18); color: var(--orange); border-color: rgba(251, 146, 60, 0.45); }
-  .cheatsheet .box-gw       { background: rgba(192, 132, 252, 0.15); color: var(--purple); border-color: rgba(192, 132, 252, 0.4); }
-  .cheatsheet .box-app      { background: rgba(250, 204, 21, 0.14); color: var(--yellow); border-color: rgba(250, 204, 21, 0.4); }
-  .cheatsheet .box-redis    { background: rgba(248, 113, 113, 0.14); color: var(--red); border-color: rgba(248, 113, 113, 0.4); }
-  .cheatsheet .box-db       { background: rgba(56, 189, 248, 0.14); color: #7dd3fc; border-color: rgba(56, 189, 248, 0.35); }
-  .cheatsheet .box-kafka    { background: rgba(74, 222, 128, 0.14); color: #86efac; border-color: rgba(74, 222, 128, 0.35); }
-  .cheatsheet .box-ws       { background: rgba(192, 132, 252, 0.16); color: #d8b4fe; border-color: rgba(192, 132, 252, 0.4); }
-  .cheatsheet .box-s3       { background: rgba(251, 146, 60, 0.14); color: #fdba74; border-color: rgba(251, 146, 60, 0.35); }
-  .cheatsheet .box-worker   { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border-color: rgba(148, 163, 184, 0.35); }
+  .cheatsheet .box-client   { background: rgba(3, 105, 161, 0.10); color: var(--accent); border-color: rgba(3, 105, 161, 0.35); }
+  .cheatsheet .box-cdn      { background: rgba(21, 128, 61, 0.10); color: var(--green); border-color: rgba(21, 128, 61, 0.35); }
+  .cheatsheet .box-lb       { background: rgba(194, 65, 12, 0.10); color: var(--orange); border-color: rgba(194, 65, 12, 0.35); }
+  .cheatsheet .box-gw       { background: rgba(126, 34, 206, 0.10); color: var(--purple); border-color: rgba(126, 34, 206, 0.35); }
+  .cheatsheet .box-app      { background: rgba(161, 98, 7, 0.10); color: var(--yellow); border-color: rgba(161, 98, 7, 0.35); }
+  .cheatsheet .box-redis    { background: rgba(185, 28, 28, 0.10); color: var(--red); border-color: rgba(185, 28, 28, 0.35); }
+  .cheatsheet .box-db       { background: rgba(3, 105, 161, 0.08); color: #0284c7; border-color: rgba(3, 105, 161, 0.3); }
+  .cheatsheet .box-kafka    { background: rgba(21, 128, 61, 0.08); color: #16a34a; border-color: rgba(21, 128, 61, 0.3); }
+  .cheatsheet .box-ws       { background: rgba(126, 34, 206, 0.08); color: #9333ea; border-color: rgba(126, 34, 206, 0.3); }
+  .cheatsheet .box-s3       { background: rgba(194, 65, 12, 0.08); color: #ea580c; border-color: rgba(194, 65, 12, 0.3); }
+  .cheatsheet .box-worker   { background: rgba(107, 114, 128, 0.10); color: #4b5563; border-color: rgba(107, 114, 128, 0.3); }
 
   /* --- Stacked instances --- */
   .cheatsheet .stack {
@@ -226,11 +227,11 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
     z-index: -1;
   }
   /* Match layer border colors to parent */
-  .cheatsheet .stack-app .layer { border-color: rgba(250, 204, 21, 0.35); border-radius: 6px; background: rgba(250, 204, 21, 0.06); }
-  .cheatsheet .stack-db .layer { border-color: rgba(56, 189, 248, 0.3); border-radius: 50px / 14px; background: rgba(56, 189, 248, 0.05); }
-  .cheatsheet .stack-redis .layer { border-color: rgba(248, 113, 113, 0.3); border-radius: 50px / 14px; background: rgba(248, 113, 113, 0.05); }
-  .cheatsheet .stack-worker .layer { border-color: rgba(148, 163, 184, 0.3); border-radius: 6px; background: rgba(148, 163, 184, 0.05); }
-  .cheatsheet .stack-kafka .layer { border-color: rgba(74, 222, 128, 0.3); border-radius: 6px; background: rgba(74, 222, 128, 0.05); }
+  .cheatsheet .stack-app .layer { border-color: rgba(161, 98, 7, 0.35); border-radius: 6px; background: rgba(161, 98, 7, 0.05); }
+  .cheatsheet .stack-db .layer { border-color: rgba(3, 105, 161, 0.3); border-radius: 50px / 14px; background: rgba(3, 105, 161, 0.05); }
+  .cheatsheet .stack-redis .layer { border-color: rgba(185, 28, 28, 0.3); border-radius: 50px / 14px; background: rgba(185, 28, 28, 0.05); }
+  .cheatsheet .stack-worker .layer { border-color: rgba(107, 114, 128, 0.3); border-radius: 6px; background: rgba(107, 114, 128, 0.05); }
+  .cheatsheet .stack-kafka .layer { border-color: rgba(21, 128, 61, 0.3); border-radius: 6px; background: rgba(21, 128, 61, 0.05); }
 
   .cheatsheet .arrow {
     color: var(--muted);
@@ -275,7 +276,7 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
   }
 
   .cheatsheet .latency-card {
-    background: #0f172a;
+    background: #eef1f5;
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 14px;
@@ -405,7 +406,7 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
           <td>Relationship-heavy queries</td>
         </tr>
         <tr style="border-top: 2px solid var(--border);">
-          <td colspan="6" style="padding: 8px 13px; color: var(--muted); font-size: 0.8rem; background: #0f172a;">
+          <td colspan="6" style="padding: 8px 13px; color: var(--muted); font-size: 0.8rem; background: #eef1f5;">
             — SQL —
           </td>
         </tr>
