@@ -1,347 +1,310 @@
 ---
-layout: null
+layout: post
 title:  "System Design Decision Map"
 date:   2026-07-30 00:00 +0800
 categories: cheatsheet
 excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QPS, database throughput/latency tradeoffs, and 8 common request-path patterns."
 ---
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>System Design Decision Map – Capacity, Paths & Latency</title>
-  <style>
-    :root {
-      --bg: #fff;
-      --card: #1e293b;
-      --border: #334155;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --green: #4ade80;
-      --yellow: #facc15;
-      --red: #f87171;
-      --purple: #c084fc;
-      --orange: #fb923c;
-    }
+<div class="cheatsheet">
+<style>
+  .cheatsheet {
+    --card: #1e293b;
+    --border: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --green: #4ade80;
+    --yellow: #facc15;
+    --red: #f87171;
+    --purple: #c084fc;
+    --orange: #fb923c;
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    font-family: -system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #404040;
+    line-height: 1.6;
+  }
 
-    body {
-      font-family: -system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: #404040;
-      line-height: 1.6;
-      padding: 40px 20px;
-      max-width: 980px;
-      margin: 0 auto;
-    }
+  .cheatsheet, .cheatsheet * {
+    box-sizing: border-box;
+  }
 
-    .back-link {
-      display: inline-block;
-      margin-bottom: 24px;
-      color: #4183C4;
-      font-size: 0.9rem;
-      text-decoration: none;
-    }
-    .back-link:hover {
-      text-decoration: underline;
-    }
+  .cheatsheet .subtitle {
+    color: #666;
+    margin-bottom: 32px;
+    font-size: 0.95rem;
+  }
 
-    h1 {
-      font-size: 1.8rem;
-      margin-bottom: 8px;
-      font-weight: bold;
-      color: #222;
-    }
+  .cheatsheet .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 28px;
+    overflow-x: auto;
+  }
 
-    .subtitle {
-      color: #666;
-      margin-bottom: 32px;
-      font-size: 0.95rem;
-    }
+  .cheatsheet h2 {
+    font-size: 1.25rem;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
 
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 28px;
-      overflow-x: auto;
-    }
+  .cheatsheet h3 {
+    font-size: 1.05rem;
+    margin: 20px 0 12px;
+    color: var(--accent);
+  }
 
-    h2 {
-      font-size: 1.25rem;
-      margin-bottom: 16px;
-      color: var(--text);
-    }
+  .cheatsheet table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
 
-    h3 {
-      font-size: 1.05rem;
-      margin: 20px 0 12px;
-      color: var(--accent);
-    }
+  .cheatsheet th, .cheatsheet td {
+    padding: 11px 13px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.92rem;
-    }
+  .cheatsheet th {
+    background: #0f172a;
+    color: var(--accent);
+    font-weight: 600;
+    white-space: nowrap;
+  }
 
-    th, td {
-      padding: 11px 13px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
+  .cheatsheet tr:last-child td {
+    border-bottom: none;
+  }
 
-    th {
-      background: #0f172a;
-      color: var(--accent);
-      font-weight: 600;
-      white-space: nowrap;
-    }
+  .cheatsheet .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 500;
+  }
 
-    tr:last-child td {
-      border-bottom: none;
-    }
+  .cheatsheet .tag-ok { background: rgba(74, 222, 128, 0.15); color: var(--green); }
+  .cheatsheet .tag-warn { background: rgba(250, 204, 21, 0.15); color: var(--yellow); }
+  .cheatsheet .tag-prefer { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
 
-    .tag {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 500;
-    }
+  .cheatsheet .short-version {
+    background: #0f172a;
+    border-left: 4px solid var(--accent);
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.88rem;
+    white-space: pre-wrap;
+    color: #cbd5e1;
+  }
 
-    .tag-ok { background: rgba(74, 222, 128, 0.15); color: var(--green); }
-    .tag-warn { background: rgba(250, 204, 21, 0.15); color: var(--yellow); }
-    .tag-prefer { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
+  .cheatsheet .note {
+    margin-top: 8px;
+    padding: 14px 16px;
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
 
-    .short-version {
-      background: #0f172a;
-      border-left: 4px solid var(--accent);
-      padding: 16px 20px;
-      border-radius: 0 8px 8px 0;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.88rem;
-      white-space: pre-wrap;
-      color: #cbd5e1;
-    }
+  .cheatsheet .note strong {
+    color: var(--accent);
+  }
 
-    .note {
-      margin-top: 8px;
-      padding: 14px 16px;
-      background: rgba(56, 189, 248, 0.08);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      border-radius: 8px;
-      font-size: 0.88rem;
-      color: var(--muted);
-    }
+  /* Flow Diagram Styles */
+  .cheatsheet .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0 8px;
+    padding: 18px 14px;
+    background: #0f172a;
+    border-radius: 10px;
+    overflow-x: auto;
+  }
 
-    .note strong {
-      color: var(--accent);
-    }
+  .cheatsheet .box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    white-space: nowrap;
+    border: 1.5px solid transparent;
+    position: relative;
+    z-index: 1;
+  }
 
-    /* Flow Diagram Styles */
-    .flow {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
-      margin: 12px 0 8px;
-      padding: 18px 14px;
-      background: #0f172a;
-      border-radius: 10px;
-      overflow-x: auto;
-    }
+  /* --- Shapes --- */
+  .cheatsheet .shape-round {
+    border-radius: 10px;
+  }
+  .cheatsheet .shape-pill {
+    border-radius: 999px;
+    padding: 8px 16px;
+  }
+  .cheatsheet .shape-diamond {
+    border-radius: 4px;
+    transform: rotate(45deg);
+    width: 52px;
+    height: 52px;
+    padding: 0;
+  }
+  .cheatsheet .shape-diamond span {
+    transform: rotate(-45deg);
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .cheatsheet .shape-cylinder {
+    border-radius: 50px / 14px;
+    padding: 10px 14px;
+  }
+  .cheatsheet .shape-skew {
+    border-radius: 6px;
+    transform: skewX(-12deg);
+  }
+  .cheatsheet .shape-skew span {
+    transform: skewX(12deg);
+    display: inline-block;
+  }
+  .cheatsheet .shape-rect {
+    border-radius: 6px;
+  }
 
-    .box {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px 12px;
-      font-size: 0.78rem;
-      font-weight: 500;
-      white-space: nowrap;
-      border: 1.5px solid transparent;
-      position: relative;
-      z-index: 1;
-    }
+  /* --- Colors --- */
+  .cheatsheet .box-client   { background: rgba(56, 189, 248, 0.18); color: var(--accent); border-color: rgba(56, 189, 248, 0.4); }
+  .cheatsheet .box-cdn      { background: rgba(74, 222, 128, 0.15); color: var(--green); border-color: rgba(74, 222, 128, 0.4); }
+  .cheatsheet .box-lb       { background: rgba(251, 146, 60, 0.18); color: var(--orange); border-color: rgba(251, 146, 60, 0.45); }
+  .cheatsheet .box-gw       { background: rgba(192, 132, 252, 0.15); color: var(--purple); border-color: rgba(192, 132, 252, 0.4); }
+  .cheatsheet .box-app      { background: rgba(250, 204, 21, 0.14); color: var(--yellow); border-color: rgba(250, 204, 21, 0.4); }
+  .cheatsheet .box-redis    { background: rgba(248, 113, 113, 0.14); color: var(--red); border-color: rgba(248, 113, 113, 0.4); }
+  .cheatsheet .box-db       { background: rgba(56, 189, 248, 0.14); color: #7dd3fc; border-color: rgba(56, 189, 248, 0.35); }
+  .cheatsheet .box-kafka    { background: rgba(74, 222, 128, 0.14); color: #86efac; border-color: rgba(74, 222, 128, 0.35); }
+  .cheatsheet .box-ws       { background: rgba(192, 132, 252, 0.16); color: #d8b4fe; border-color: rgba(192, 132, 252, 0.4); }
+  .cheatsheet .box-s3       { background: rgba(251, 146, 60, 0.14); color: #fdba74; border-color: rgba(251, 146, 60, 0.35); }
+  .cheatsheet .box-worker   { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border-color: rgba(148, 163, 184, 0.35); }
 
-    /* --- Shapes --- */
-    .shape-round {
-      border-radius: 10px;
-    }
-    .shape-pill {
-      border-radius: 999px;
-      padding: 8px 16px;
-    }
-    .shape-diamond {
-      border-radius: 4px;
-      transform: rotate(45deg);
-      width: 52px;
-      height: 52px;
-      padding: 0;
-    }
-    .shape-diamond span {
-      transform: rotate(-45deg);
-      font-size: 0.72rem;
-      font-weight: 600;
-    }
-    .shape-cylinder {
-      border-radius: 50px / 14px;
-      padding: 10px 14px;
-    }
-    .shape-skew {
-      border-radius: 6px;
-      transform: skewX(-12deg);
-    }
-    .shape-skew span {
-      transform: skewX(12deg);
-      display: inline-block;
-    }
-    .shape-rect {
-      border-radius: 6px;
-    }
+  /* --- Stacked instances --- */
+  .cheatsheet .stack {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 4px;
+  }
+  .cheatsheet .stack .box {
+    position: relative;
+  }
+  .cheatsheet .stack .layer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 100%;
+    border: 1.5px solid;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .cheatsheet .stack .layer-1 {
+    top: -5px;
+    left: 3px;
+    right: -3px;
+    opacity: 0.45;
+    z-index: 0;
+  }
+  .cheatsheet .stack .layer-2 {
+    top: -10px;
+    left: 6px;
+    right: -6px;
+    opacity: 0.25;
+    z-index: -1;
+  }
+  /* Match layer border colors to parent */
+  .cheatsheet .stack-app .layer { border-color: rgba(250, 204, 21, 0.35); border-radius: 6px; background: rgba(250, 204, 21, 0.06); }
+  .cheatsheet .stack-db .layer { border-color: rgba(56, 189, 248, 0.3); border-radius: 50px / 14px; background: rgba(56, 189, 248, 0.05); }
+  .cheatsheet .stack-redis .layer { border-color: rgba(248, 113, 113, 0.3); border-radius: 50px / 14px; background: rgba(248, 113, 113, 0.05); }
+  .cheatsheet .stack-worker .layer { border-color: rgba(148, 163, 184, 0.3); border-radius: 6px; background: rgba(148, 163, 184, 0.05); }
+  .cheatsheet .stack-kafka .layer { border-color: rgba(74, 222, 128, 0.3); border-radius: 6px; background: rgba(74, 222, 128, 0.05); }
 
-    /* --- Colors --- */
-    .box-client   { background: rgba(56, 189, 248, 0.18); color: var(--accent); border-color: rgba(56, 189, 248, 0.4); }
-    .box-cdn      { background: rgba(74, 222, 128, 0.15); color: var(--green); border-color: rgba(74, 222, 128, 0.4); }
-    .box-lb       { background: rgba(251, 146, 60, 0.18); color: var(--orange); border-color: rgba(251, 146, 60, 0.45); }
-    .box-gw       { background: rgba(192, 132, 252, 0.15); color: var(--purple); border-color: rgba(192, 132, 252, 0.4); }
-    .box-app      { background: rgba(250, 204, 21, 0.14); color: var(--yellow); border-color: rgba(250, 204, 21, 0.4); }
-    .box-redis    { background: rgba(248, 113, 113, 0.14); color: var(--red); border-color: rgba(248, 113, 113, 0.4); }
-    .box-db       { background: rgba(56, 189, 248, 0.14); color: #7dd3fc; border-color: rgba(56, 189, 248, 0.35); }
-    .box-kafka    { background: rgba(74, 222, 128, 0.14); color: #86efac; border-color: rgba(74, 222, 128, 0.35); }
-    .box-ws       { background: rgba(192, 132, 252, 0.16); color: #d8b4fe; border-color: rgba(192, 132, 252, 0.4); }
-    .box-s3       { background: rgba(251, 146, 60, 0.14); color: #fdba74; border-color: rgba(251, 146, 60, 0.35); }
-    .box-worker   { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border-color: rgba(148, 163, 184, 0.35); }
+  .cheatsheet .arrow {
+    color: var(--muted);
+    font-size: 1.15rem;
+    flex-shrink: 0;
+    font-weight: 300;
+  }
 
-    /* --- Stacked instances --- */
-    .stack {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 4px;
-    }
-    .stack .box {
-      position: relative;
-    }
-    .stack .layer {
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 100%;
-      border: 1.5px solid;
-      border-radius: inherit;
-      pointer-events: none;
-    }
-    .stack .layer-1 {
-      top: -5px;
-      left: 3px;
-      right: -3px;
-      opacity: 0.45;
-      z-index: 0;
-    }
-    .stack .layer-2 {
-      top: -10px;
-      left: 6px;
-      right: -6px;
-      opacity: 0.25;
-      z-index: -1;
-    }
-    /* Match layer border colors to parent */
-    .stack-app .layer { border-color: rgba(250, 204, 21, 0.35); border-radius: 6px; background: rgba(250, 204, 21, 0.06); }
-    .stack-db .layer { border-color: rgba(56, 189, 248, 0.3); border-radius: 50px / 14px; background: rgba(56, 189, 248, 0.05); }
-    .stack-redis .layer { border-color: rgba(248, 113, 113, 0.3); border-radius: 50px / 14px; background: rgba(248, 113, 113, 0.05); }
-    .stack-worker .layer { border-color: rgba(148, 163, 184, 0.3); border-radius: 6px; background: rgba(148, 163, 184, 0.05); }
-    .stack-kafka .layer { border-color: rgba(74, 222, 128, 0.3); border-radius: 6px; background: rgba(74, 222, 128, 0.05); }
+  /* Vertical fork layout */
+  .cheatsheet .fork {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-left: 2px;
+    padding-left: 10px;
+    border-left: 2px solid var(--border);
+  }
+  .cheatsheet .fork-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cheatsheet .fork-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    min-width: 52px;
+    text-align: right;
+  }
 
-    .arrow {
-      color: var(--muted);
-      font-size: 1.15rem;
-      flex-shrink: 0;
-      font-weight: 300;
-    }
+  .cheatsheet .path-label {
+    font-size: 0.9rem;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
 
+  .cheatsheet .latency-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
 
-    /* Vertical fork layout */
-    .fork {
-      display: inline-flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-left: 2px;
-      padding-left: 10px;
-      border-left: 2px solid var(--border);
-    }
-    .fork-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .fork-label {
-      font-size: 0.72rem;
-      color: var(--muted);
-      min-width: 52px;
-      text-align: right;
-    }
+  .cheatsheet .latency-card {
+    background: #0f172a;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+  }
 
-    .path-label {
-      font-size: 0.9rem;
-      color: var(--text);
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
+  .cheatsheet .latency-card .title {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
 
-    .latency-summary {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-      margin-top: 16px;
-    }
+  .cheatsheet .latency-card .value {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text);
+  }
 
-    .latency-card {
-      background: #0f172a;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
-    }
+  .cheatsheet .latency-card .sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
 
-    .latency-card .title {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .latency-card .value {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .latency-card .sub {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .section-divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 28px 0;
-    }
-  </style>
-</head>
-<body>
-  <a href="/" class="back-link">&larr; Emmett Young</a>
-  <h1>System Design Decision Map</h1>
-  <p class="subtitle">Capacity limits, request paths & latency budgets for interviews</p>
+  .cheatsheet .section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+</style>
+  <p class="subtitle">Capacity limits, request paths &amp; latency budgets for interviews</p>
 
   <!-- ===================== CAPACITY ===================== -->
   <div class="card">
@@ -786,7 +749,4 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
       QPS/latency numbers are rough interview ballparks, not production guarantees.
     </div>
   </div>
-
-
-</body>
-</html>
+</div>
