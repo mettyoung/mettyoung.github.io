@@ -22,16 +22,30 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
     font-family: -system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: #404040;
     line-height: 1.6;
+
+    width: 100vw;
+    max-width: 1400px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0 24px;
   }
 
   .cheatsheet, .cheatsheet * {
     box-sizing: border-box;
   }
 
-  .cheatsheet .subtitle {
-    color: #666;
-    margin-bottom: 32px;
-    font-size: 0.95rem;
+  .cheatsheet .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+    gap: 20px;
+    align-items: start;
+  }
+
+  .cheatsheet .patterns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+    gap: 24px 32px;
   }
 
   .cheatsheet .card {
@@ -306,8 +320,7 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
     margin: 28px 0;
   }
 </style>
-  <p class="subtitle">Capacity limits, request paths &amp; latency budgets for interviews</p>
-
+  <div class="cards-grid">
   <!-- ===================== CAPACITY ===================== -->
   <div class="card">
     <h2>1. SQL → NoSQL Decision Table (by QPS)</h2>
@@ -458,7 +471,9 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
       <span style="font-size:0.8rem;">QPS &amp; latency are interview ballparks (order of magnitude).</span>
     </p>
 
+    <div class="patterns-grid">
     <!-- 1. Read-Heavy -->
+    <div class="pattern">
     <p class="path-label">1. Read-Heavy + Cache</p>
     <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">Bitly · Yelp · LeetCode · Distributed Cache · Rate Limiter</p>
     <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
@@ -495,8 +510,10 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
       </div>
     </div>
 
+    </div>
     <!-- 2. Fan-out -->
-    <p class="path-label" style="margin-top:22px">2. Fan-out on Write</p>
+    <div class="pattern">
+    <p class="path-label">2. Fan-out on Write</p>
     <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">FB News Feed · Instagram · Notification System · FB Live Comments · News Aggregator</p>
     <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
       Read: 50k–500k QPS · Write: 5k–50k QPS · p99: 50–150 ms (write) / &lt; 50 ms (read from cache)
@@ -537,8 +554,10 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
       </div>
     </div>
 
+    </div>
     <!-- 3. Real-time -->
-    <p class="path-label" style="margin-top:22px">3. Real-time (WS / Pub-Sub)</p>
+    <div class="pattern">
+    <p class="path-label">3. Real-time (WS / Pub-Sub)</p>
     <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">WhatsApp · Google Docs · Online Chess · Tinder · Uber · ChatGPT · FB Live Comments</p>
     <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
       Read/Push: 10k–100k msg/s · Write: 10k–100k msg/s · p99: &lt; 50–100 ms (push)
@@ -570,8 +589,10 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
       </div>
     </div>
 
+    </div>
     <!-- 4. Media -->
-    <p class="path-label" style="margin-top:22px">4. Media + Async Processing</p>
+    <div class="pattern">
+    <p class="path-label">4. Media + Async Processing</p>
     <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">Dropbox · YouTube · Instagram · Strava</p>
     <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
       Upload: 1k–20k QPS · Read (CDN): 100k–1M+ · p99: upload &lt; 200–500 ms · processing async
@@ -608,8 +629,10 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
       </div>
     </div>
 
+    </div>
     <!-- 5. Event Aggregation -->
-    <p class="path-label" style="margin-top:22px">5. Event / Write Aggregation</p>
+    <div class="pattern">
+    <p class="path-label">5. Event / Write Aggregation</p>
     <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">Ad Click Aggregator · Metrics Monitoring · Price Tracking · Web Crawler · Job Scheduler</p>
     <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
       Write/Ingest: 50k–1M+ events/s · Read: 1k–20k QPS · p99: ingest &lt; 50–100 ms · query varies
@@ -649,8 +672,10 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
       </div>
     </div>
 
+    </div>
     <!-- 6. Search -->
-    <p class="path-label" style="margin-top:22px">6. Search-Heavy</p>
+    <div class="pattern">
+    <p class="path-label">6. Search-Heavy</p>
     <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">FB Post Search · Yelp · News Aggregator · YouTube Top K</p>
     <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
       Read/Search: 10k–100k QPS · Write/Index: 1k–20k QPS · p99: search 50–200 ms
@@ -689,8 +714,10 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
       </div>
     </div>
 
+    </div>
     <!-- 7. Contention -->
-    <p class="path-label" style="margin-top:22px">7. Contention / Consistency</p>
+    <div class="pattern">
+    <p class="path-label">7. Contention / Consistency</p>
     <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">Ticketmaster · Online Auction · Payment System · Robinhood · Local Delivery</p>
     <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
       Write: 1k–20k QPS (limited by locks) · Read: 10k–100k QPS · p99: 50–200 ms (hot rows higher)
@@ -721,8 +748,10 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
       </div>
     </div>
 
+    </div>
     <!-- 8. Geospatial -->
-    <p class="path-label" style="margin-top:22px">8. Geospatial / Matching</p>
+    <div class="pattern">
+    <p class="path-label">8. Geospatial / Matching</p>
     <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 4px;">Uber · Tinder · Local Delivery · Strava</p>
     <p style="font-size:0.8rem;color:var(--accent);margin:0 0 8px;">
       Location write: 10k–100k QPS · Match/read: 10k–50k QPS · p99: 50–150 ms
@@ -744,11 +773,14 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
       <span class="arrow">→</span>
       <span class="box box-kafka shape-skew"><span>Matching</span></span>
     </div>
+    </div>
+    </div>
 
     <div class="note" style="margin-top:20px">
       <strong>Fork layout:</strong> vertical branch after the split point (hit/miss, write/fan-out, live/persist, etc.)<br>
       Stacked boxes = multiple instances · ◆ = LB · Cylinder = Cache/DB/S3 · Skew = Queue<br>
       QPS/latency numbers are rough interview ballparks, not production guarantees.
     </div>
+  </div>
   </div>
 </div>
