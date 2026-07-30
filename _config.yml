@@ -2,6 +2,7 @@
 # This file contains configuration flags to customize your site
 #
 
+encoding: utf-8
 # Name of your site (displayed in the header)
 name: Emmett Young
 
@@ -99,4 +100,3 @@ exclude:
   - LICENSE
   - README.md
   - CNAME
-
