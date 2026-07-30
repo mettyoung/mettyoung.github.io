@@ -37,9 +37,22 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
 
   .cheatsheet .cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
     align-items: start;
+  }
+
+  .cheatsheet .col-left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+
+  @media (max-width: 900px) {
+    .cheatsheet .cards-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   .cheatsheet .patterns-grid {
@@ -321,6 +334,7 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
   }
 </style>
   <div class="cards-grid">
+  <div class="col-left">
   <!-- ===================== CAPACITY ===================== -->
   <div class="card">
     <h2>1. SQL → NoSQL Decision Table (by QPS)</h2>
@@ -461,6 +475,7 @@ excerpt: "A visual decision map for system design interviews: SQL vs NoSQL by QP
       <strong>Rule of thumb:</strong> Need consistent p99 &lt; 2–5 ms? → Use in-memory KV (Redis).<br>
       Disk-based databases (SQL or most NoSQL) rarely deliver consistent sub-2ms tail latency under real load.
     </div>
+  </div>
   </div>
 
   <!-- ===================== REQUEST PATHS ===================== -->
