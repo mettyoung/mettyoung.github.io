@@ -59,6 +59,9 @@ Worst case degrades to O(log n) per bin because Java 8+ treeifies bins with 8+ c
 
 ## 2. Concurrent Sets
 
+### `ConcurrentHashMap.newKeySet()`
+Same complexities and locking as `ConcurrentHashMap` — it's literally a `KeySetView` wrapper where values are a shared dummy `Boolean.TRUE` object.
+
 ### `ConcurrentSkipListSet<E>`
 Just a `ConcurrentSkipListMap<E, Boolean>` under the hood — same locking model, same complexities, values are dummy `Boolean.TRUE`.
 
@@ -78,9 +81,6 @@ Backed by `CopyOnWriteArrayList` (see below) with a linear `contains()` scan for
 | `contains(e)` | O(n) | Linear scan, lock-free read |
 | `remove(e)` | O(n) | Scan + copy |
 | iteration | O(n) | Snapshot iterator |
-
-### `ConcurrentHashMap.newKeySet()`
-Same complexities and locking as `ConcurrentHashMap` — it's literally a `KeySetView` wrapper where values are a shared dummy `Boolean.TRUE` object.
 
 ## 3. Concurrent Lists
 
