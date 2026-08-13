@@ -82,6 +82,15 @@ Backed by `CopyOnWriteArrayList` (see below) with a linear `contains()` scan for
 | `remove(e)` | O(n) | Scan + copy |
 | iteration | O(n) | Snapshot iterator |
 
+<div class="callout">
+  <span class="callout-title">⚖️ Which concurrent set?</span>
+  <ul>
+    <li><strong>Default choice:</strong> <code>ConcurrentHashMap.newKeySet()</code> — same O(1) avg lookups and low-lock writes as <code>ConcurrentHashMap</code>, no ordering overhead. Reach for this unless you have a specific reason not to.</li>
+    <li><strong>Need sorted iteration or range queries</strong> (<code>first()</code>/<code>last()</code>-style navigation): <code>ConcurrentSkipListSet</code> — O(log n) instead of O(1), but it's the only one of the three that keeps elements ordered.</li>
+    <li><strong>Read-heavy, rarely mutated, need iterators that never throw <code>ConcurrentModificationException</code></strong>: <code>CopyOnWriteArraySet</code> — O(n) writes make it a poor fit for anything mutated often.</li>
+  </ul>
+</div>
+
 ## 3. Concurrent Lists
 
 ### `CopyOnWriteArrayList<E>`
