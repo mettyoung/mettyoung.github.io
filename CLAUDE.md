@@ -32,3 +32,4 @@ No test suite, linter, or CI workflow exists in this repo (`.github/` only conta
 ## Workflow
 
 - When asked to change an existing article (`_posts/`), commit and push to `origin master` after making the edit — no need to ask first. GitHub Pages auto-builds from master, so this publishes the change live.
+- After pushing, verify the change live (curl or WebFetch the post URL, e.g. `mettyoung.com/<slug>/`, checking for the new content/markup) before reporting done. GitHub Pages builds take a bit — poll rather than checking once immediately.
