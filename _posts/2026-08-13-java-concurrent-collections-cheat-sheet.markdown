@@ -13,6 +13,8 @@ Here's each implementation broken down by common methods, complexity, and the co
 
 **Locking design:** Pre-Java 8, this used **segment-based locking** — the map was divided into 16 segments (default), each with its own lock, so up to 16 threads could write concurrently as long as they hit different segments. Java 8+ threw out segments entirely. Now it locks at the **bin (bucket) level**: each bucket head node is the synchronization point. Reads (`get`) are fully lock-free, using `volatile` reads and `Unsafe`/`VarHandle` access — no locking at all. Writes use **CAS** to insert into an empty bin; if the bin's occupied, it synchronizes on just that bin's first node. Table resizing is done cooperatively — multiple threads can help transfer nodes to the new table.
 
+**Bucket count & distribution:** The bucket array (`table`) always sizes to a **power of 2** — default initial capacity is 16 buckets. It grows when `size > capacity * loadFactor` (default load factor 0.75, so 16 buckets resizes at 12 entries), and each resize **doubles** the table. A key's bucket index isn't just `hashCode() % buckets` — `ConcurrentHashMap` first runs a **spread function**, `h ^ (h >>> 16)`, XOR-folding the high 16 bits of the hash into the low bits, then masks with `(n - 1) & hash` to get the index (cheap because `n` is a power of 2). The XOR-spread step matters for concurrency: without it, hash codes that only differ in high bits (a common pattern for `Integer`/enum-derived hashes) would collide into the same bin far more often, defeating the whole point of per-bin locking by forcing threads to fight over a handful of hot bins instead of spreading writes across the table. If a bin still accumulates 8+ collisions **and** the table has reached at least 64 buckets, that bin treeifies into a red-black tree; below 64 buckets it resizes the whole table instead, since treeifying a tiny table doesn't help distribution the way growing it does.
+
 | Method | Complexity | Notes |
 |---|---|---|
 | `get(key)` | O(1) avg | Fully lock-free volatile read |
@@ -30,6 +32,11 @@ Worst case degrades to O(log n) per bin because Java 8+ treeifies bins with 8+ c
 
 **Locking design:** No locks on reads at all — traversal is lock-free using `volatile` next-pointers. Insertion/deletion use **CAS** on individual node links, not a global or per-node lock. This works because a skip list's structure is a set of independent linked lists at different "levels," so a CAS-based splice at one level doesn't require blocking the rest of the structure. This is why skip lists are preferred over trees here: rebalancing a red-black tree touches many nodes and would require locking large parts of it; a skip list's insert only needs local CAS operations on the levels it touches.
 
+<div class="callout">
+  <span class="callout-title">📺 How skip lists work</span>
+  If the level structure isn't clicking, <a href="https://www.youtube.com/watch?v=ol-FaNLXlR0" target="_blank" rel="noopener">this video</a> walks through skip list mechanics visually — useful background before reasoning about how CAS splices operate on top of it.
+</div>
+
 | Method | Complexity | Notes |
 |---|---|---|
 | `get(key)` | O(log n) | Lock-free traversal down levels |
@@ -38,6 +45,17 @@ Worst case degrades to O(log n) per bin because Java 8+ treeifies bins with 8+ c
 | `firstKey` / `lastKey` | O(log n) | Or O(1) with cached fields depending on version |
 | `ceilingKey` / `floorKey` / `higherKey` / `lowerKey` | O(log n) | Skip-list navigation |
 | `subMap` / `headMap` / `tailMap` | O(log n) to construct | Returns a live view, not a copy |
+
+<div class="callout callout-tradeoff">
+  <span class="callout-title">⚖️ ConcurrentHashMap vs ConcurrentSkipListMap</span>
+  <ul>
+    <li><strong>Ordering:</strong> <code>ConcurrentHashMap</code> has none. <code>ConcurrentSkipListMap</code> keeps keys sorted, so it's the only one of the two that supports <code>firstKey</code>/<code>ceilingKey</code>/<code>subMap</code>-style range queries.</li>
+    <li><strong>Lookup cost:</strong> <code>ConcurrentHashMap</code> is O(1) avg via bucket indexing. <code>ConcurrentSkipListMap</code> is O(log n) — it has to walk levels since there's no hash table underneath.</li>
+    <li><strong>Write contention:</strong> both are effectively lock-free/low-lock in the common case, but skip list writes are pure CAS splices with no bin lock fallback at all, so they hold up slightly better under pathological single-bin hash collisions.</li>
+    <li><strong>Memory:</strong> skip list nodes carry multiple forward-pointer levels per entry (randomized, geometric distribution) — more overhead per entry than a hash map's flat bucket array + single next-pointer.</li>
+    <li><strong>Default choice:</strong> reach for <code>ConcurrentHashMap</code> unless you specifically need sorted iteration or range queries — it's faster and simpler for pure key lookups.</li>
+  </ul>
+</div>
 
 ## 2. Concurrent Sets
 

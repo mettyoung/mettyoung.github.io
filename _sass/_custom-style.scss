@@ -28,6 +28,38 @@
             white-space: nowrap;
         }
     }
+
+    .entry .callout {
+        margin: 1.5em 0;
+        padding: 0.8em 1.2em;
+        border-left: 4px solid $blue;
+        background: #eef5fc;
+        border-radius: 4px;
+        font-size: 16px;
+
+        ul {
+            margin: 0.5em 0 0;
+            padding-left: 1.2em;
+        }
+
+        li {
+            margin-bottom: 0.4em;
+        }
+
+        li:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .entry .callout-title {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 0.4em;
+    }
+
+    .entry .callout-tradeoff {
+        border-left-color: #c2410c;
+    }
 }
 
 .nav-menu {
