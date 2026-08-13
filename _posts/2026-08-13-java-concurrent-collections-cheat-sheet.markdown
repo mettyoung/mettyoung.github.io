@@ -97,6 +97,11 @@ Backed by `CopyOnWriteArrayList` (see below) with a linear `contains()` scan for
 | `contains(e)` / `indexOf(e)` | O(n) | Lock-free, scans the snapshot array |
 | iteration | O(n) | Iterator holds a reference to the array snapshot at creation — never reflects later mutations, never throws CME |
 
+<div class="callout">
+  <span class="callout-title">❓ Why is there no ConcurrentSkipListList?</span>
+  Skip lists work great for <code>Map</code>/<code>Set</code> because those are keyed by comparison — elements find their own place in sorted order, no positional index involved. A <code>List</code>'s contract is the opposite: <code>get(index)</code>, <code>add(index, e)</code> — callers pick the position. A self-ordering structure can't honor "insert this at index 3" while also keeping itself sorted by comparison, so the two contracts are fundamentally incompatible. That's why no such class exists in <code>java.util.concurrent</code>.
+</div>
+
 ## 4. Queues and Deques
 
 ### `ConcurrentLinkedQueue<E>` (non-blocking)
