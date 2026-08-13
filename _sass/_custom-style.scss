@@ -30,35 +30,68 @@
     }
 
     .entry .callout {
-        margin: 1.5em 0;
-        padding: 0.8em 1.2em;
-        border-left: 4px solid $blue;
-        background: #eef5fc;
-        border-radius: 4px;
+        --callout-accent: #{$blue};
+        --callout-tint: #eef5fc;
+
+        position: relative;
+        margin: 1.8em 0;
+        padding: 1em 1.2em 1em 1.4em;
+        border-radius: 10px;
+        background: var(--callout-tint);
+        box-shadow: rgba(36, 37, 38, 0.12) 2px 1px 7px 0px;
         font-size: 16px;
+        line-height: 1.6;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            border-radius: 10px 0 0 10px;
+            background: var(--callout-accent);
+        }
 
         ul {
-            margin: 0.5em 0 0;
+            margin: 0.6em 0 0;
             padding-left: 1.2em;
         }
 
         li {
-            margin-bottom: 0.4em;
+            margin-bottom: 0.5em;
         }
 
         li:last-child {
             margin-bottom: 0;
         }
+
+        a {
+            color: var(--callout-accent);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 3px;
+            padding: 0.1em 0.35em;
+        }
     }
 
     .entry .callout-title {
-        display: block;
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
         font-weight: bold;
-        margin-bottom: 0.4em;
+        font-size: 17px;
+        margin-bottom: 0.5em;
+        color: $darkerGray;
     }
 
     .entry .callout-tradeoff {
-        border-left-color: #c2410c;
+        --callout-accent: #c2410c;
+        --callout-tint: #fdf1ea;
     }
 }
 
