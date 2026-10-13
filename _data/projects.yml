@@ -1,0 +1,35 @@
+# Projects shown on /projects/. featured: true renders as the large card on top.
+- title: Credit Card Application Modulith System
+  featured: true
+  summary: >-
+    A credit card application workflow (draft, ID upload, submit, identity check, decision) built as a
+    modular monolith on Postgres alone: transactional outbox, inbox, database leases and a reconciler,
+    so double-clicks, crashes and lost webhooks never start, skip or repeat a step.
+  tags: [Java 21, Spring Boot, PostgreSQL, S3 uploads, Cloudflare Containers]
+  links:
+    - { label: Live demo, url: "https://creditcardapplication.mettyoung.com/" }
+    - { label: Architecture, url: "https://creditcardapplication.mettyoung.com/architecture/decision-loop.html" }
+    - { label: Article, url: "/engineering-a-durable-workflow-system/" }
+    - { label: Source, url: "https://github.com/mettyoung/credit-card-system" }
+
+- title: Deconstruct Chinese
+  status: Android closed testing
+  summary: >-
+    An app for learning Chinese: translate text, see it broken down into vocabulary, and watch words in a
+    watchlist ranked by how often they come up.
+  tags: [Kotlin, Compose Multiplatform, Android]
+  links:
+    - { label: Source, url: "https://github.com/mettyoung/deconstruct-chinese" }
+    - { label: Privacy policy, url: "/deconstruct-chinese/privacy/" }
+
+- title: Singapore Railway System
+  summary: A Singapore railway route planner, containerised and deployed to a VPS using Ansible.
+  tags: [Spring Boot, ReactJS, Docker, Ansible]
+  links:
+    - { label: Source, url: "https://github.com/mettyoung/railway-routing-service" }
+
+- title: Parking Lot System
+  summary: A parking lot console application using clean architecture, TDD and OOP design.
+  tags: [Java, Maven, Spock]
+  links:
+    - { label: Source, url: "https://github.com/mettyoung/automated-valet-car-parking-system" }

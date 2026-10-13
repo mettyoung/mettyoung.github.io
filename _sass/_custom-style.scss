@@ -129,35 +129,93 @@
     }
   }
   
-  .projects-container {
+  .projects {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(48%, 1fr));
-    gap: 1em;
-  
-    .project-box {
-      padding: 15px;
-      box-shadow: rgba(36,37,38,0.21) 2px 1px 7px 0px;
-      border-radius: 10px;
-    
-      h2 {
-        text-align: left;
-        font-size: 25px;
+    gap: 1.25em;
+    margin-top: 1em;
+  }
+
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid $lightGray;
+    border-radius: 10px;
+    box-shadow: rgba(36,37,38,0.12) 0 1px 6px;
+    overflow: hidden;
+    background: $white;
+    transition: box-shadow .15s ease;
+
+    &:hover { box-shadow: rgba(36,37,38,0.22) 0 2px 12px; }
+
+    .project-card__body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 16px 18px;
+    }
+
+    .project-card__eyebrow {
+      margin: 0 0 4px;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: $blue;
+    }
+
+    .project-card__title {
+      text-align: left;
+      font-size: 22px;
+      line-height: 1.25;
+      margin: 0;
+    }
+
+    .project-card__status {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: $gray;
+      font-style: italic;
+    }
+
+    .project-card__summary {
+      margin: 10px 0 12px;
+      color: $darkGray;
+    }
+
+    .project-card__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      list-style: none;
+      margin: 0 0 14px;
+      padding: 0;
+
+      li {
         margin: 0;
-      }
-    
-      p {
-        margin: 0;
-      }
-    
-      blockquote {
-        p {
-          margin: 0 0 5px 0;
-        }
-      }
-    
-      img {
-        border-radius: 10px;
+        padding: 2px 9px;
+        font-size: 12px;
+        border-radius: 999px;
+        background: $lightGray;
+        color: $darkGray;
       }
     }
+
+    .project-card__links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin: auto 0 0;
+      font-weight: bold;
+      font-size: 15px;
+    }
+  }
+
+  .project-card {
+    border-color: rgba(65,131,196,.45);
+    .project-card__title { font-size: 26px; }
+    .project-card__body { padding: 20px 22px; }
+  }
+
+  @include mobile {
+    .project-card .project-card__title { font-size: 22px; }
   }
   

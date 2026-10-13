@@ -4,27 +4,12 @@ title: Projects
 permalink: /projects/
 ---
 
-These are some of the projects I've worked on in my spare time. Please feel free to explore them!
+Things I've built in my spare time, newest first.
 
-<div class="projects-container">
-<div markdown="1" class="project-box">
-[![](/images/project-singapore-railway-system.png)](https://github.com/mettyoung/railway-routing-service)
-## [Singapore Railway System](https://github.com/mettyoung/railway-routing-service)
+{% assign featured = site.data.projects | where: "featured", true %}
+{% assign others = site.data.projects | where_exp: "p", "p.featured != true" %}
 
-> A Singapore railway route planner containerized web application **deployed to a VPS using Ansible**.
-
-> **Tech Stack:** Spring Boot, ReactJS, Docker
-
-> **[Live Demo](http://li857-204.members.linode.com/)**
-</div>
-
-<div markdown="1" class="project-box">
-[![](/images/project-automated-valet-car-parking-system.png)](https://github.com/mettyoung/automated-valet-car-parking-system)
-## [Parking Lot System](https://github.com/mettyoung/automated-valet-car-parking-system)
-
-> A parking lot console application using **clean architecture, TDD, and OOP design**.
-
-> **Tech Stack:** Java, Maven, Spock
-   
-</div>
+<div class="projects">
+{% for p in featured %}{% include project-card.html project=p featured=true %}{% endfor %}
+{% for p in others %}{% include project-card.html project=p %}{% endfor %}
 </div>

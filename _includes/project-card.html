@@ -1,0 +1,11 @@
+{% assign p = include.project %}
+<article class="project-card{% if include.featured %} project-card--featured{% endif %}">
+  <div class="project-card__body">
+    {% if include.featured %}<p class="project-card__eyebrow">Featured</p>{% endif %}
+    <h2 class="project-card__title">{{ p.title }}</h2>
+    {% if p.status %}<p class="project-card__status">{{ p.status }}</p>{% endif %}
+    <p class="project-card__summary">{{ p.summary }}</p>
+    <ul class="project-card__tags">{% for t in p.tags %}<li>{{ t }}</li>{% endfor %}</ul>
+    <p class="project-card__links">{% for l in p.links %}<a href="{{ l.url | relative_url }}"{% if l.url contains '://' %} target="_blank" rel="noopener"{% endif %}>{{ l.label }}</a>{% endfor %}</p>
+  </div>
+</article>
