@@ -102,7 +102,7 @@
 
 .footer-link-container{
     margin: 0 auto;
-    max-width: 740px;
+    max-width: 960px;
     padding: 10px 0;
     width: 100%;
   
@@ -219,3 +219,13 @@
     .project-card .project-card__title { font-size: 22px; }
   }
   
+// Blog digest (index post list): left-align titles, dates, excerpts and "Read More".
+// Scoped to .posts so post pages (article.post.detailed) and other pages keep their alignment.
+.posts > .post {
+    h1,
+    .post_date,
+    .excerpt,
+    .read-more {
+        text-align: left;
+    }
+}
